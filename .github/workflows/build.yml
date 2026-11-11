@@ -58,8 +58,9 @@ jobs:
         run: |
           FILE="app/src/main/java/com/casper/iptv/CasperPlayer.java"
           test -f "$FILE"
+          sed -i '/^[[:space:]]*import androidx\.annotation\.NonNull;/d' "$FILE"
           sed -i 's/@NonNull[[:space:]]*//g' "$FILE"
-          echo "Removed unresolved NonNull annotations"
+          echo "Fixed unresolved NonNull references"
 
       - name: Build APK
         working-directory: project/CasperIPTV
