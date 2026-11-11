@@ -46,9 +46,11 @@ jobs:
           unzip -q Casper-IPTV-v0.3.5-source.zip -d project
           find project -maxdepth 4 -name build.gradle
 
+    
       - name: Build APK
         working-directory: project/CasperIPTV
         run: |
+          echo "android.useAndroidX=true" >> gradle.properties
           wget -q https://services.gradle.org/distributions/gradle-8.9-bin.zip
           unzip -q gradle-8.9-bin.zip
           ./gradle-8.9/bin/gradle assembleDebug --no-daemon
