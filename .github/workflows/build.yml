@@ -53,6 +53,15 @@ jobs:
           echo "android.useAndroidX=true" >> gradle.properties
           echo "android.enableJetifier=true" >> gradle.properties
 
+      - name: Fix Java NonNull imports
+        working-directory: project/CasperIPTV
+        run: |
+          FILE="app/src/main/java/com/casper/iptv/CasperPlayer.java"
+          test -f "$FILE"
+          if ! grep -q '^import androidx.annotation.NonNull;' "$FILE"; then
+            sed -i '/^package com\.casper\.iptv;/a import androidx.annotation.NonNull;' "$FILE"
+          fi
+
       - name: Build APK
         working-directory: project/CasperIPTV
         run: |
