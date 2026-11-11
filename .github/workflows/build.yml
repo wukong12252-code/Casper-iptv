@@ -22,11 +22,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Prepare Android SDK
+      - name: Find Android SDK
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
-          yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools" \
+          find "$ANDROID_HOME" -name sdkmanager -type f || true
+          ls -la "$ANDROID_HOME/cmdline-tools" || true
+
+      - name: Install Android packages
+        run: |
+          SDKMANAGER=$(find "$ANDROID_HOME" -name sdkmanager -type f | head -n 1)
+          if [ -z "$SDKMANAGER" ]; then
+            echo "Android sdkmanager not found"
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
 
@@ -34,7 +44,7 @@ jobs:
         run: |
           mkdir -p project
           unzip -q Casper-IPTV-v0.3.5-source.zip -d project
-          find project -maxdepth 3 -name build.gradle -o -name build.gradle.kts
+          find project -maxdepth 4 -name build.gradle
 
       - name: Build APK
         working-directory: project/CasperIPTV
