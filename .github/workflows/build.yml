@@ -8,9 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,12 +22,19 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Prepare Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Unpack project
         run: |
+          mkdir -p project
           unzip -q Casper-IPTV-v0.3.5-source.zip -d project
+          find project -maxdepth 3 -name build.gradle -o -name build.gradle.kts
 
       - name: Build APK
         working-directory: project/CasperIPTV
@@ -40,3 +48,4 @@ jobs:
         with:
           name: Casper-IPTV-v0.3.5-APK
           path: project/CasperIPTV/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
